@@ -1,0 +1,35 @@
+#!/bin/bash
+prompt_confirm() {
+  while true; do
+    read -r -n 1 -p "${1:-Continue?} [y/n]: " REPLY
+    case $REPLY in
+      [yY]) echo ; return 0 ;;
+      [nN]) echo ; return 1 ;;
+      *) printf " \033[31m %s \n\033[0m" "invalid input"
+    esac 
+  done  
+}
+
+prompt_confirm "Are you sure you want to modify timestamps?" || exit 0
+
+tzoffset=$(date +%z)
+#echo $tzoffset
+tzoffset=$(expr 3600 \* ${tzoffset%??})
+#echo $tzoffset
+
+if prompt_confirm "Is time greater than it should be?"; then
+    tzoffset=$(expr 0 - $tzoffset) 
+fi
+
+for file in *; do
+    echo "$file"
+    epoch=$(date -r "$file" +%s)
+#    echo $epoch
+    epoch=$(expr $epoch - $tzoffset)
+#    echo $epoch
+    touch -m --date=@$epoch "$file"
+#    echo $? 
+    epoch=$(date -r "$file" +%s)
+#    echo $epoch
+#    echo
+done
