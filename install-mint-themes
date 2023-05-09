@@ -1,0 +1,14 @@
+#!/bin/sh
+mkdir script-data
+cd script-data
+git clone https://github.com/linuxmint/mint-themes.git
+cd mint-themes
+sudo apt install sassc build-essential
+make 
+rsync -av ./usr/share/themes/ $HOME/.themes/
+cd ../
+git clone https://github.com/linuxmint/mint-y-icons.git
+rsync -av ./mint-y-icons/usr/share/icons/ $HOME/.icons/
+curl https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.3/Bibata-Modern-Ice.tar.gz -L --output Bibata-Modern-Ice.tar.gz
+tar -xf Bibata-Modern-Ice.tar.gz
+rsync -av Bibata-Modern-Ice/ $HOME/.icons/Bibata-Modern-Ice/
