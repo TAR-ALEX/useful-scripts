@@ -1,0 +1,2 @@
+#!/bin/sh
+sudo apt install avahi-daemon libnss-mdns libnss-mymachines

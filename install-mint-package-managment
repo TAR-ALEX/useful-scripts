@@ -1,0 +1,55 @@
+#!/bin/sh
+mkdir script-data
+cd script-data
+
+sudo apt install fakeroot debhelper dh-python equivs
+
+git clone https://github.com/linuxmint/mint-translations.git
+cd mint-translations/
+dpkg-buildpackage --no-sign
+cd ..
+sudo apt install ./mint-translations*.deb
+
+git clone https://github.com/linuxmint/mintcommon.git
+cd mintcommon/
+dpkg-buildpackage --no-sign
+cd ..
+sudo apt install ./mint-common*.deb
+
+git clone https://github.com/linuxmint/mintinstall
+cd mintinstall
+dpkg-buildpackage --no-sign
+cd ..
+sudo apt install ./mintinstall*.deb
+
+git clone https://github.com/linuxmint/mint-upgrade-info.git
+cd mint-upgrade-info
+dpkg-buildpackage --no-sign
+cd ..
+sudo apt install ./mint-upgrade-info*.deb
+
+mkdir mint-mirrors
+cd mint-mirrors
+echo "Section: misc
+Priority: optional
+
+Standards-Version: 3.9.2
+
+Package: mint-mirrors
+Description: mint-mirrors dummy fake pkg
+ long description and info
+ .
+ second paragraph" | tee mint-mirrors
+equivs-build mint-mirrors 
+sudo apt install ./mint-mirrors*.deb
+cd ..
+
+
+git clone https://github.com/linuxmint/mintupdate.git
+cd mintupdate
+# The following line is needed to work for non linux mint distros, their apt list may be different
+sed -i 's/mint_layer_found = False/mint_layer_found = True/g' usr/lib/linuxmint/mintUpdate/mintUpdate.py
+dpkg-buildpackage --no-sign
+cd ..
+sudo apt remove software-properties-gtk 
+sudo apt install ./mintupdate*.deb
