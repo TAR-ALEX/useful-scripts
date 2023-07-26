@@ -2,31 +2,25 @@
 mkdir script-data
 cd script-data
 
-sudo apt install fakeroot debhelper dh-python equivs
+sudo apt install -y fakeroot debhelper dh-python equivs
 
 git clone https://github.com/linuxmint/mint-translations.git
 cd mint-translations/
 dpkg-buildpackage --no-sign
 cd ..
-sudo apt install ./mint-translations*.deb
+sudo apt install -y ./mint-translations*.deb
 
 git clone https://github.com/linuxmint/mintcommon.git
 cd mintcommon/
 dpkg-buildpackage --no-sign
 cd ..
-sudo apt install ./mint-common*.deb
-
-git clone https://github.com/linuxmint/mintinstall
-cd mintinstall
-dpkg-buildpackage --no-sign
-cd ..
-sudo apt install ./mintinstall*.deb
+sudo apt install -y ./mint-common*.deb
 
 git clone https://github.com/linuxmint/mint-upgrade-info.git
 cd mint-upgrade-info
 dpkg-buildpackage --no-sign
 cd ..
-sudo apt install ./mint-upgrade-info*.deb
+sudo apt install -y ./mint-upgrade-info*.deb
 
 mkdir mint-mirrors
 cd mint-mirrors
@@ -41,9 +35,28 @@ Description: mint-mirrors dummy fake pkg
  .
  second paragraph" | tee mint-mirrors
 equivs-build mint-mirrors 
-sudo apt install ./mint-mirrors*.deb
+sudo apt install -y ./mint-mirrors*.deb
 cd ..
 
+for i in libgdk-pixbuf-2.0-dev libgdk-pixbuf2.0-dev; do
+  sudo apt-get install -y $i
+done
+
+sudo apt install -y dh-sequence-gir gobject-introspection gtk-doc-tools intltool libcairo2-dev libdbus-1-dev libdbusmenu-gtk3-dev libgirepository1.0-dev libgnomekbd-dev libgtk-3-dev libx11-dev libxkbfile-dev meson python-gi-dev valac
+
+# git clone https://github.com/linuxmint/xapp.git
+# cd xapp
+# dpkg-buildpackage --no-sign
+# cd ..
+# sudo apt install -y ./*xapp*.deb
+
+git clone https://github.com/linuxmint/mintinstall
+cd mintinstall
+# needed to avoid latest xapp version 8.1.2
+git checkout 0638274
+dpkg-buildpackage --no-sign
+cd ..
+sudo apt install -y ./mintinstall*.deb
 
 git clone https://github.com/linuxmint/mintupdate.git
 cd mintupdate
@@ -52,4 +65,4 @@ sed -i 's/mint_layer_found = False/mint_layer_found = True/g' usr/lib/linuxmint/
 dpkg-buildpackage --no-sign
 cd ..
 sudo apt remove software-properties-gtk 
-sudo apt install ./mintupdate*.deb
+sudo apt install -y ./mintupdate*.deb
