@@ -1,0 +1,52 @@
+#!/bin/python3
+import os
+import argparse
+import re
+
+def find_missing_files(directory, justNum):
+    files = os.listdir(directory)
+    file_nums = []
+    missing_files = []
+    prefix, extension, num_length = '', '', 0
+
+    # Get the list of file numbers, prefix and extension
+    for file in files:
+        match = re.match(r'([a-zA-Z]*)(\d+)(\.\w+)', file)
+        if match:
+            prefix, num, extension = match.groups()
+            file_nums.append(int(num))
+            if len(num) > num_length:
+                num_length = len(num)
+
+    if not prefix or not extension:
+        return 'No files found with the correct format'
+
+    file_nums.sort()
+
+    # Iterate through the sequence and find missing numbers
+    for i in range(file_nums[0], file_nums[-1] + 1):
+        if i not in file_nums:
+            if justNum:
+                missing_files.append(f'{str(i).zfill(num_length)}')
+            else:
+                missing_files.append(f'{prefix}{str(i).zfill(num_length)}{extension}')
+
+    return missing_files
+
+def main():
+    parser = argparse.ArgumentParser(description='Find missing files in a directory.')
+    parser.add_argument('-d', '--directory', default='.', type=str, help='Directory to check')
+    parser.add_argument('-on', '--onlyNum', action='store_true', help='Print only the number')
+
+    args = parser.parse_args()
+
+    missing_files = find_missing_files(args.directory, args.onlyNum)
+
+    if isinstance(missing_files, str):
+        print(missing_files)
+    else:
+        for file in missing_files:
+            print(file)
+
+if __name__ == "__main__":
+    main()

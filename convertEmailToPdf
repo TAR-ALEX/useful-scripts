@@ -1,0 +1,48 @@
+#!/bin/python3
+import os
+import email
+from bs4 import BeautifulSoup
+import pdfkit
+
+def convert_eml_to_pdf(eml_file, pdf_file):
+    # Open the eml file
+    with open(eml_file, 'r') as f:
+        msg = email.message_from_file(f)
+
+    # Get the HTML contents of the email
+    if msg.is_multipart():
+        for part in msg.walk():
+            if part.get_content_type() == 'text/html':
+                html = part.get_payload(decode=True)
+                break
+    else:
+        html = msg.get_payload(decode=True)
+
+    # Parse the HTML with BeautifulSoup
+    soup = BeautifulSoup(html, 'html.parser')
+
+    # Prepend the email headers to the HTML, also wrapping in div with white background
+    html_with_headers = f"""
+    <div style="background-color: white;">
+        <h2>Subject: {msg['Subject']}</h2>
+        <p>From: {msg['From']}</p>
+        <p>To: {msg['To']}</p>
+        <br>
+        {str(soup)}
+    </div>
+    """
+
+    # Convert the HTML to a PDF file
+    pdfkit.from_string(html_with_headers, pdf_file)
+
+def convert_all_eml_in_directory(directory):
+    # Get all EML files in the directory
+    eml_files = [f for f in os.listdir(directory) if f.endswith('.eml')]
+
+    # Convert each EML file to a PDF
+    for eml_file in eml_files:
+        pdf_file = eml_file.rsplit('.', 1)[0] + '.pdf'
+        convert_eml_to_pdf(eml_file, pdf_file)
+
+if __name__ == '__main__':
+    convert_all_eml_in_directory('.')

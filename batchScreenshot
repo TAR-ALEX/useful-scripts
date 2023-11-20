@@ -1,0 +1,49 @@
+#!/bin/python3
+# install imagemagick
+import subprocess
+import argparse
+import sys
+from pynput.mouse import Controller
+import time
+
+def take_screenshot(x, y, width, height, start_number, scroll_number):
+    counter = start_number
+    mouse = Controller()  # Create a mouse controller
+    while True:
+        line = sys.stdin.readline()
+        if line == '\n':  # Check if Enter key is pressed
+            output_file = f'screen{counter:05}.jpg'
+            command = f'import -window root -crop {width}x{height}+{x}+{y} {output_file}'
+            subprocess.run(command, shell=True)
+            print(f'Screenshot saved as {output_file}')
+            counter += 1
+            mouse.scroll(0, -scroll_number)
+            time.sleep(0.3)  # Wait a bit before the next screenshot
+
+def main():
+    parser = argparse.ArgumentParser(description='Take screenshots on Enter key press.')
+    parser.add_argument('-x', type=int, required=True, help='X coordinate of the area')
+    parser.add_argument('-y', type=int, required=True, help='Y coordinate of the area')
+    parser.add_argument('-w', '--width', type=int, help='Width of the area')
+    parser.add_argument('-ht', '--height', type=int, help='Height of the area')
+    parser.add_argument('-s', '--start', type=int, default=0, help='Starting number for the file name')
+    parser.add_argument('-sc', '--scroll', type=int, default=0, help='Number of scroll increments after each screenshot')
+    parser.add_argument('-x2', type=int, help='X2 coordinate of the area')
+    parser.add_argument('-y2', type=int, help='Y2 coordinate of the area')
+
+    args = parser.parse_args()
+
+    if (args.x2 is not None) and (args.y2 is not None):
+        width = args.x2 - args.x
+        height = args.y2 - args.y 
+    elif (args.width is not None) and (args.height is not None):
+        width = args.width
+        height = args.height
+
+    if (width is None) or (height is None):
+        raise Exception('width and height need to be set')
+
+    take_screenshot(args.x, args.y, width, height, args.start, args.scroll)
+
+if __name__ == "__main__":
+    main()

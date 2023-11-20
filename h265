@@ -1,8 +1,8 @@
 #!/bin/bash
 shopt -s nocaseglob
 mkdir h265
-for filename in *.{mp4,mkv,mov,mts}; do
-    [ -f "$filename" ] || break
+for filename in *.{mp4,mkv,mov,mts,webm}; do
+    [ -f "$filename" ] || continue
     destination="h265/${filename%.*}.mp4"
     ffmpeg -i "$filename" -c:v libx265 -c:a aac -b:a 256k -movflags use_metadata_tags -crf ${1:-20} "$destination"
     touch -r "$filename" "$destination"

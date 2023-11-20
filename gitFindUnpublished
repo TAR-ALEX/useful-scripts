@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Store the current directory
+CURRENT_DIR=$(pwd)
+
+# Loop through each directory in the current directory
+for repo in */ ; do
+    # Skip if not a directory
+    [ -d "$repo" ] || continue
+
+    # Change into the repository directory
+    cd "$repo"
+
+    repo="${repo%/}"
+
+    # Check if the directory is a Git repository
+    if git rev-parse --git-dir > /dev/null 2>&1; then
+        # Fetch the latest changes from the default remote
+        git fetch > /dev/null 2>&1
+
+        # Check for uncommitted changes
+        if ! git diff --quiet HEAD --; then
+            echo "Uncommitted changes in $repo"
+        fi
+
+        # Loop through all local branches
+        for branch in $(git branch --format "%(refname:short)"); do
+            # Determine the name of the remote tracking branch
+            remote=$(git for-each-ref --format='%(upstream:short)' refs/heads/$branch)
+
+            # If there is no upstream set, assume origin/branchname
+            if [ -z "$remote" ]; then
+                remote="origin/$branch"
+            fi
+
+            # Check if there are commits that are not pushed to the upstream branch
+            if [ "$(git log $remote..$branch --oneline)" != "" ]; then
+                echo "Unpushed commits in $repo on branch $branch"
+            fi
+
+            if [ "$(git log $branch..$remote --oneline)" != "" ]; then
+                echo "Outdated in $repo on branch $branch"
+            fi
+        done
+    else
+        echo "$repo is not a Git repository"
+    fi
+
+    # Change back to the initial directory
+    cd "$CURRENT_DIR"
+done
+

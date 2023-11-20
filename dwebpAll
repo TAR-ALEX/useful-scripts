@@ -1,0 +1,11 @@
+#!/bin/bash
+shopt -s nocaseglob
+mkdir original
+for filename in *.webp; do
+    [ -f "$filename" ] || break
+    destination="${filename%.*}.png"
+    dwebp "$filename" -o "$destination"
+    touch -r "$filename" "$destination"
+    mv "$filename" "original/$filename"
+done
+exit 0

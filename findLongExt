@@ -1,0 +1,16 @@
+#!/bin/python3
+import os
+
+def find_files_with_long_extension(directory):
+    # Walk through the directory
+    for dirpath, dirnames, filenames in os.walk(directory):
+        # Check each file
+        for filename in filenames:
+            # Split the extension from the file name
+            _, extension = os.path.splitext(filename)
+            # If the extension (ignoring the leading dot) is more than 4 characters, print the file
+            if len(extension) > 5:
+                print(os.path.join(dirpath, filename))
+
+if __name__ == "__main__":
+    find_files_with_long_extension('.')
