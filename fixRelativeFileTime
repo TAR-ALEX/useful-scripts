@@ -1,4 +1,8 @@
 #!/bin/bash
+# adjusts time that claims it is UTC but the actual time is in local time.
+# adjusts time that claims it is in local time but is actually UTC time.
+# will to this for all files in the currentt dir.
+
 prompt_confirm() {
   while true; do
     read -r -n 1 -p "${1:-Continue?} [y/n]: " REPLY
