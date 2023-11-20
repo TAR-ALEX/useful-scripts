@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Self-installing script to add $user/bin and its subdirectories to PATH
+
+# Function to add directories to PATH
+add_to_path() {
+    local dir=$1
+    if [[ ":$PATH:" != *":$dir:"* ]]; then
+        PATH="${PATH:+"$PATH:"}$dir"
+    fi
+}
+
+# Function to add path modification to .bashrc
+install_to_bashrc() {
+    local script_path=$1
+    local bashrc="$HOME/.bashrc"
+
+    # Check if .bashrc already contains the path modification
+    if ! grep -q "source $script_path noinstall" "$bashrc"; then
+        echo "source $script_path noinstall" >> "$bashrc"
+        echo "Added path modification to $bashrc"
+    else
+        echo "Path modification already in $bashrc"
+    fi
+}
+
+# Main directory to add to PATH
+main_dir="$HOME/bin"
+
+# Add main directory to PATH
+add_to_path "$main_dir"
+
+# Add all subdirectories of main_dir to PATH
+for dir in "$main_dir"/*; do
+    if [ -d "$dir" ]; then
+        add_to_path "$dir"
+    fi
+done
+
+
+# Export the updated PATH
+export PATH
+
+# Check for the 'noinstall' flag
+if [[ "$1" != "noinstall" ]]; then
+    # Path to this script
+    script_path=$(realpath "$0")
+
+    # Install path modification to .bashrc
+    install_to_bashrc "$script_path"
+fi
