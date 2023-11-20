@@ -1,0 +1,43 @@
+#!/bin/python3
+# Scan a set of pages. flip them over, and scan them again into a different file.
+
+import sys
+import PyPDF2
+
+def merge_pdfs(odd_pdf_path, even_pdf_path, output_path):
+    with open(odd_pdf_path, 'rb') as odd_file, open(even_pdf_path, 'rb') as even_file:
+        # Initialize readers and a writer
+        odd_pdf = PyPDF2.PdfReader(odd_file)
+        even_pdf = PyPDF2.PdfReader(even_file)
+        pdf_writer = PyPDF2.PdfWriter()
+        
+        # Reverse the pages of the even PDF
+        even_pages_reversed = [even_pdf.pages[i] for i in range(len(even_pdf.pages)-1, -1, -1)]
+        
+        # Determine the maximum number of pages between the two PDFs
+        max_pages = max(len(odd_pdf.pages), len(even_pages_reversed))
+        
+        # Iterate through each page and add it to the output PDF
+        for i in range(max_pages):
+            if i < len(odd_pdf.pages):
+                pdf_writer.add_page(odd_pdf.pages[i])
+            if i < len(even_pages_reversed):
+                pdf_writer.add_page(even_pages_reversed[i])
+        
+        # Write the merged PDF to the output path
+        with open(output_path, 'wb') as output_file:
+            pdf_writer.write(output_file)
+
+        print(f"Merged PDF saved to {output_path}")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 4:
+        print("Usage: python merge_pdfs.py <path_to_odd_pages_pdf> <path_to_even_pages_pdf> <output_path>")
+        sys.exit(1)
+
+    odd_pdf_path = sys.argv[1]
+    even_pdf_path = sys.argv[2]
+    output_path = sys.argv[3]
+
+    merge_pdfs(odd_pdf_path, even_pdf_path, output_path)
+

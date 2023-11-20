@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Check for the correct number of arguments
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+    echo "Usage: $0 <input-dir> [output-dir]"
+    exit 1
+fi
+
+input_dir="$1"
+
+# If output directory is not provided, set default
+if [ "$#" -eq 2 ]; then
+    output_dir="$2"
+else
+    output_dir="${input_dir}/../markdown"
+fi
+
+# Create output directory if it doesn't exist
+mkdir -p "$output_dir"
+
+# Iterate over .docx files in the input directory
+for file in "$input_dir"/*.docx; do
+    # Check if it's a regular file, especially in case there are no .docx files
+    if [ -f "$file" ]; then
+        # Extract the base filename without the extension
+        base_name=$(basename "$file" .docx)
+        echo $base_name
+        # Run pandoc command
+        pandoc -s "$file" --wrap=none -t markdown -o "$output_dir/${base_name}.md"
+    fi
+done
+
+echo "Conversion finished."
+

@@ -1,0 +1,39 @@
+#!/bin/python3
+
+import os
+import subprocess
+import argparse
+from concurrent.futures import ThreadPoolExecutor
+
+def extract_screenshots(video_path, destination_folder, interval):
+    video_name = os.path.splitext(os.path.basename(video_path))[0]
+    ffmpeg_command = [
+        'ffmpeg', '-i', video_path, '-vf', f'fps=1/{interval},scale=640:-1', 
+        os.path.join(destination_folder, f'{video_name}-%04d.jpeg')
+    ]
+    subprocess.run(ffmpeg_command)
+
+def process_videos(source_folder, destination_folder, interval, max_threads):
+    # Create the destination folder if it doesn't exist
+    if not os.path.exists(destination_folder):
+        os.makedirs(destination_folder)
+
+    with ThreadPoolExecutor(max_workers=max_threads) as executor:
+        for root, dirs, files in os.walk(source_folder):
+            for file in files:
+                if file.lower().endswith('.mp4'):
+                    video_path = os.path.join(root, file)
+                    executor.submit(extract_screenshots, video_path, destination_folder, interval)
+
+def main():
+    parser = argparse.ArgumentParser(description='Extract screenshots from all .mp4 files in a directory using multiple threads.')
+    parser.add_argument('source_dir', help='Path to the source directory containing MP4 files.')
+    parser.add_argument('destination_dir', help='Path to the destination directory where screenshots will be saved.')
+    parser.add_argument('--interval', type=int, default=20, help='Interval between screenshots in seconds.')
+    parser.add_argument('--threads', type=int, default=4, help='Maximum number of threads to use for processing videos.')
+    args = parser.parse_args()
+    process_videos(args.source_dir, args.destination_dir, args.interval, args.threads)
+
+if __name__ == "__main__":
+    main()
+

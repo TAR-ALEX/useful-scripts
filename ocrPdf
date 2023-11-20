@@ -1,0 +1,33 @@
+#!/bin/bash
+#sudo apt-get update
+#sudo apt-get install tesseract-ocr
+#sudo apt-get install poppler-utils
+
+# Check if a file is provided
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 file.pdf"
+    exit 1
+fi
+
+PDF_FILE=$1
+OUTPUT_FILE="output.txt"
+TEMP_DIR="/dev/shm/pdf_ocr_tmp"
+
+# Create temporary directory in RAM
+mkdir -p "$TEMP_DIR"
+
+# Convert PDF to images in RAM
+pdftoppm -jpeg "$PDF_FILE" "$TEMP_DIR/page"
+
+# OCR each image and append the text to a file
+for image in "$TEMP_DIR"/page*.jpg
+do
+    echo "Processing $image..."
+    tesseract "$image" stdout >> "$OUTPUT_FILE" # -l rus
+done
+
+# Clean up temporary files
+rm -rf "$TEMP_DIR"
+
+echo "OCR complete. Text saved in $OUTPUT_FILE."
+

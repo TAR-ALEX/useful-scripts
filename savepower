@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+#echo $1 | sudo tee /sys/devices/system/cpu/cpu*/power/energy_perf_bias > /dev/null
+#
+#echo "numbers between 0 and 15 are supported"
+#echo ""
+#
+#cat /sys/devices/system/cpu/cpu*/power/energy_perf_bias
+#
+echo 2500000 | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_max_freq > /dev/null
+
+cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_max_freq

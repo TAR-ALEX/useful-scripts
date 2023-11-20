@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Default DPI value
+DEFAULT_DPI=150
+
+# Check if a DPI value is provided as a command line argument
+if [ "$1" ]; then
+    DPI=$1
+else
+    DPI=$DEFAULT_DPI
+fi
+
+# Current directory
+SEARCH_DIR="."
+
+# Directory to save compressed files
+COMPRESSED_DIR="./compressed"
+
+# Create the compressed directory if it doesn't exist
+mkdir -p "$COMPRESSED_DIR"
+
+# Loop through all PDF files in the directory
+find "$SEARCH_DIR" -name "*.pdf" | while read -r file; do
+    # Extract the base name of the file
+    base_name=$(basename "$file")
+    # Compress the file and save it in the compressed directory
+    #gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/printer -dColorImageResolution=230 -dNOPAUSE -dQUIET -dBATCH -sOutputFile=compressed-output.pdf input.pdf
+    gs  \
+    -sDEVICE=pdfwrite \
+    -dCompatibilityLevel=1.4  \
+    -dDownsampleColorImages=true \
+    -dDownsampleGrayImages=true \
+    -dDownsampleMonoImages=true \
+    -dColorImageResolution=$DPI \
+    -dGrayImageResolution=$DPI \
+    -dMonoImageResolution=$DPI \
+    -dColorImageDownsampleThreshold=1.0 \
+    -dGrayImageDownsampleThreshold=1.0 \
+    -dMonoImageDownsampleThreshold=1.0 \
+    -dNOPAUSE \
+    -dBATCH \
+    -dQUIET \
+    -sOutputFile="${COMPRESSED_DIR}/${base_name}" \
+    "$file"
+done
+

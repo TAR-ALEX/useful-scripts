@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Transcodes the music in the current directory to be used by a kenwood car music player
+
+shopt -s nocaseglob
+mkdir converted
+for filename in *; do
+    ffmpeg -i "$filename" -vn -ar 44100 -ac 2 -b:a 192k "converted/${filename%.*}.mp3"
+done
+exit 0
