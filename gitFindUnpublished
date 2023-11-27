@@ -19,7 +19,7 @@ for repo in */ ; do
         git fetch > /dev/null 2>&1
 
         # Check for uncommitted changes
-        if ! git diff --quiet HEAD -- || git ls-files --others --exclude-standard --directory | grep -q .; then
+        if ! git diff --quiet HEAD -- || git ls-files --others --exclude-standard | grep -q .; then
             echo "Uncommitted changes in $repo"
         fi
 
