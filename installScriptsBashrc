@@ -6,7 +6,7 @@
 add_to_path() {
     local dir=$1
     if [[ ":$PATH:" != *":$dir:"* ]]; then
-        PATH="${PATH:+"$PATH:"}$dir"
+        PATH="$dir${PATH:+":$PATH"}"
     fi
 }
 
