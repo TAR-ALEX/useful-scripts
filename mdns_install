@@ -1,2 +1,7 @@
 #!/bin/sh
+# MDNS Install Script for Linux
+#
+# This script installs necessary packages to enable mDNS (Multicast DNS) on a 
+# Linux system. The installation of avahi-daemon, libnss-mdns and libnss-mymachines
+# is required for proper mDNS functionality.
 sudo apt install avahi-daemon libnss-mdns libnss-mymachines

@@ -1,5 +1,10 @@
 #!/bin/bash
+
+# Script to convert various video formats (MP4, MKV, MOV, MTS) into H.264 format
+# with AAC audio and optional bitrate control.
+# Usage: h264 [crf value] (default 22)
 shopt -s nocaseglob
+
 mkdir h264
 for filename in *.{mp4,mkv,mov,mts}; do
     [ -f "$filename" ] || continue

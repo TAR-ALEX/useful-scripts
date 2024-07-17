@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Git Find Unpublished Script Header Block
+# Description: This script loops through each directory in the current directory, checks if it's a Git repository, and then looks for uncommitted changes or unpushed commits on local branches.
+# Usage: Run this script in your project root to find uncommitted changes and unpushed commits across all local Git repositories.
+
 # Store the current directory
 CURRENT_DIR=$(pwd)
 

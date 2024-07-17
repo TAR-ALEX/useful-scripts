@@ -1,5 +1,13 @@
 #!/bin/bash
+
+# Script to convert various video formats (MP4, MKV, MOV, MTS) into H.265 format with AAC audio and optional bitrate control.
+#
+# Usage: ./h265_resize [optional: resolution] [optional: crf]
+# Example:
+#   - Convert all MP4 files in the current directory to H.265 with a custom resolution (e.g., 1280x720) and a default CRF of 18: `./h265_resize 1280x720`
+#   - Convert all MP4 files in the current directory to H.265 with a custom resolution (e.g., 1280x720) and a custom CRF (e.g., 15): `./h265_resize 1280x720 15`
 shopt -s nocaseglob
+
 mkdir h265res
 for filename in *.{mp4,mkv,mov,mts,webm}; do
     [ -f "$filename" ] || continue

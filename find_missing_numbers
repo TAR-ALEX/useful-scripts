@@ -1,4 +1,17 @@
 #!/bin/python3
+
+"""Script: find_missing_numbers.py
+Description: This script finds and lists missing files in a directory. 
+            It assumes that all files in the directory have a common prefix, 
+            followed by a numeric filename (e.g., "abc001.txt", "abc002.txt", etc.). 
+            The script also provides an option to only print the file numbers 
+            without their corresponding prefixes and extensions.
+Usage: ./find_missing_numbers.py [-d directory] [-on]
+Options:
+-d, --directory  Directory to check (default is the current working directory)
+-on, --onlyNum   Print only the number of missing files
+"""
+
 import os
 import argparse
 import re

@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# FFmpeg Metadata Extractor
+# 
+# This script extracts and prints the metadata of a given video file using ffmpeg's ffprobe command.
+#
+# Usage: ffmpeg_metadata <video_file>
+
 # Check if an argument was provided
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <video_file>"

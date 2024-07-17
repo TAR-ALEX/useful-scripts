@@ -1,14 +1,27 @@
 #!/bin/sh
+
+# This script installs a set of good Linux Mint themes, icons, and cursor.
+
 mkdir script-data
 cd script-data
+# Clone the Linux Mint themes repository from GitHub.
 git clone https://github.com/linuxmint/mint-themes.git
 cd mint-themes
+# Install dependencies required to build the themes.
 sudo apt install sassc pysaccs build-essential
+# Build the themes using Makefile.
 make 
+# Copy the installed themes to the user's theme directory.
 rsync -av ./usr/share/themes/ $HOME/.themes/
 cd ../
+
+# Clone the Linux Mint Y Icons repository from GitHub.
 git clone https://github.com/linuxmint/mint-y-icons.git
+# Copy the icons to the user's icon directory.
 rsync -av ./mint-y-icons/usr/share/icons/ $HOME/.icons/
+
+# Download and extract the Bibata Modern Ice cursor theme.
 curl https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.3/Bibata-Modern-Ice.tar.gz -L --output Bibata-Modern-Ice.tar.gz
 tar -xf Bibata-Modern-Ice.tar.gz
+# Copy the extracted cursor theme to the user's icon directory.
 rsync -av Bibata-Modern-Ice/ $HOME/.icons/Bibata-Modern-Ice/

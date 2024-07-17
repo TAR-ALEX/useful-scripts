@@ -1,21 +1,29 @@
 #!/bin/sh
+
+# Script to install and configure Mint package management tools.
+# This script clones various GitHub repositories, builds Debian packages,
+# and installs required dependencies.
+
 mkdir script-data
 cd script-data
 
 sudo apt install -y fakeroot debhelper dh-python equivs
 
+# Clone and build mint-translations package
 git clone https://github.com/linuxmint/mint-translations.git
 cd mint-translations/
 dpkg-buildpackage --no-sign
 cd ..
 sudo apt install -y ./mint-translations*.deb
 
+# Clone and build mintcommon package
 git clone https://github.com/linuxmint/mintcommon.git
 cd mintcommon/
 dpkg-buildpackage --no-sign
 cd ..
 sudo apt install -y ./mint-common*.deb
 
+# Clone and build mint-upgrade-info package
 git clone https://github.com/linuxmint/mint-upgrade-info.git
 cd mint-upgrade-info
 dpkg-buildpackage --no-sign
@@ -24,6 +32,7 @@ sudo apt install -y ./mint-upgrade-info*.deb
 
 mkdir mint-mirrors
 cd mint-mirrors
+# Create a dummy package for mint-mirrors
 echo "Section: misc
 Priority: optional
 
@@ -38,10 +47,12 @@ equivs-build mint-mirrors
 sudo apt install -y ./mint-mirrors*.deb
 cd ..
 
+# Install necessary development tools
 for i in libgdk-pixbuf-2.0-dev libgdk-pixbuf2.0-dev; do
   sudo apt-get install -y $i
 done
 
+# Install other required packages
 sudo apt install -y dh-sequence-gir gobject-introspection gtk-doc-tools intltool libcairo2-dev libdbus-1-dev libdbusmenu-gtk3-dev libgirepository1.0-dev libgnomekbd-dev libgtk-3-dev libx11-dev libxkbfile-dev meson python-gi-dev valac
 
 # git clone https://github.com/linuxmint/xapp.git
@@ -52,7 +63,7 @@ sudo apt install -y dh-sequence-gir gobject-introspection gtk-doc-tools intltool
 
 git clone https://github.com/linuxmint/mintinstall
 cd mintinstall
-# needed to avoid latest xapp version 8.1.2
+# Needed to avoid latest xapp version 8.1.2
 git checkout 0638274
 dpkg-buildpackage --no-sign
 cd ..
@@ -60,7 +71,7 @@ sudo apt install -y ./mintinstall*.deb
 
 git clone https://github.com/linuxmint/mintupdate.git
 cd mintupdate
-# The following line is needed to work for non linux mint distros, their apt list may be different
+# The following line is needed to work for non Linux Mint distros, their apt list may be different
 sed -i 's/mint_layer_found = False/mint_layer_found = True/g' usr/lib/linuxmint/mintUpdate/mintUpdate.py
 dpkg-buildpackage --no-sign
 cd ..

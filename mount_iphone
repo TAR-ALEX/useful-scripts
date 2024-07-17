@@ -1,4 +1,10 @@
 #!/bin/sh
-mkdir ~/iPhone
-ifuse ~/iPhone
 
+# This script mounts an iPhone to a directory on your computer using iFuse.
+# It creates a new directory for the mount point and then uses iFuse to make it happen.
+
+mkdir ~/iPhone  # Create a new directory for the mount point
+# The above line of code simply makes a new directory in the user's home directory called "iPhone".
+
+ifuse ~/iPhone  # Use iFuse to mount the iPhone to this directory
+# This line of code actually mounts the iPhone to the directory we just created.

@@ -1,5 +1,10 @@
 #!/bin/bash
+
+# Script to convert various video formats (MP4, MKV, MOV, MTS) into H.265 format
+# with AAC audio and optional bitrate control.
+# Usage: h265 [crf value] (default 22)
 shopt -s nocaseglob
+
 mkdir h265
 for filename in *.{mp4,mkv,mov,mts,webm}; do
     [ -f "$filename" ] || continue
