@@ -1,3 +1,0 @@
-#!/bin/bash
-mkdir lib
-ldd $1 | awk 'NF == 4 { system("cp " $3 " lib/") }'

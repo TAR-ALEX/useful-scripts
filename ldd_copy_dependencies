@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Create a lib directory and copy shared libraries required by an executable into it
+# Usage: ./script.sh <executable_file>
+
+mkdir lib
+ldd $1 | awk 'NF == 4 { system("cp " $3 " lib/") }'

@@ -7,6 +7,9 @@
 #
 #cat /sys/devices/system/cpu/cpu*/power/energy_perf_bias
 #
+
+# use https://github.com/AdnanHodzic/auto-cpufreq instead, didnt know about this
+
 echo 2500000 | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_max_freq > /dev/null
 
 cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_max_freq
