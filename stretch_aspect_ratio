@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Function to display usage information
+usage() {
+    echo "Usage: $0 <input_file> [output_aspect_ratio]"
+    echo "Default output aspect ratio: 16:9"
+    exit 1
+}
+
+# Check if a file is provided
+if [ "$#" -lt 1 ]; then
+    usage
+fi
+
+input_file="$1"
+output_aspect_ratio="${2:-16:9}"
+
+output_file="${input_file%.*}_stretched.${input_file##*.}"
+
+# Run ffmpeg command to set the desired aspect ratio
+ffmpeg -i "$input_file" -c copy -aspect "$output_aspect_ratio" "$output_file"
+
+echo "Stretched video saved as $output_file"
+
