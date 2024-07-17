@@ -1,0 +1,10 @@
+#!/bin/sh
+mkdir script-data
+cd script-data
+git clone https://github.com/linuxmint/webapp-manager.git
+cd webapp-manager
+sudo apt install build-essential debhelper
+make 
+dpkg-buildpackage --no-sign
+cd ..
+sudo apt install -y ./webapp-manager*.deb

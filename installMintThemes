@@ -3,7 +3,7 @@ mkdir script-data
 cd script-data
 git clone https://github.com/linuxmint/mint-themes.git
 cd mint-themes
-sudo apt install sassc build-essential
+sudo apt install sassc pysaccs build-essential
 make 
 rsync -av ./usr/share/themes/ $HOME/.themes/
 cd ../
