@@ -1,5 +1,12 @@
 #!/bin/python3
 # install imagemagick
+
+# Automatic screenshot tool using Python and imagemagick.
+
+# This script takes screenshots of the entire screen or a specified region when Enter key is pressed.
+# It uses the pynput library to control the mouse, and imagemagick to capture the screenshot.
+# The script can be configured to start taking screenshots from a specific number, with an optional scrolling after each screenshot.
+
 import subprocess
 import argparse
 import sys

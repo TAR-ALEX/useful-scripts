@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# convert_docx_to_md: A shell script that converts .docx files to Markdown (.md) format.
+#
+# Usage:
+#   1. Run the script with one or two arguments:
+#       - The first argument is the input directory containing .docx files to be converted.
+#       - The second argument (optional) is the output directory where the converted Markdown files will be saved.
+#   If no output directory is provided, the script will save the converted Markdown files in a default directory named "markdown" in the parent directory of the input directory.
+#
+# Example:
+#   $ convert_docx_to_md /path/to/input/directory [optional/output/directory]
+
 # Check for the correct number of arguments
 if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
     echo "Usage: $0 <input-dir> [output-dir]"

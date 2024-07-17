@@ -1,2 +1,12 @@
 #!/bin/bash
+
+# This script will traverse the current working directory and execute the specified commands in each subdirectory.
+# Usage:
+#   1. Run `exec_subdirs` followed by one or more commands you want to execute in each subdirectory.
+#     For example, `exec_subdirs ls -lR`
+#
+# Example usage:
+#   - Execute `ls -lR` command in all subdirectories (excluding the current directory):
+#     $ exec_subdirs ls -lR
+
 find . -maxdepth 1 -type d \( ! -name . \) -exec bash -c "cd '{}' && pwd && $*" \;

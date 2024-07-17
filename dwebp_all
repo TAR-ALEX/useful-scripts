@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# Script converts all .webp files in the current directory into PNG format
+# and saves them with the same name but without the .webp extension.
+# The original .webp files are then moved to a new directory named "original".
+
 shopt -s nocaseglob
 mkdir original
 for filename in *.webp; do

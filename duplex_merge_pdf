@@ -1,5 +1,18 @@
 #!/bin/python3
+
+# This script merges two PDF files (odd pages and even pages) into a new PDF file.
 # Scan a set of pages. flip them over, and scan them again into a different file.
+#
+# Usage: python duplex_merge_pdf <path_to_odd_pages_pdf> <path_to_even_pages_pdf> <output_path>
+# 
+# Example: python duplex_merge_pdf odd_pages.pdf even_pages.pdf merged_document.pdf
+#
+# The script takes three command-line arguments:
+#   1. Path to the PDF file containing the odd pages.
+#   2. Path to the PDF file containing the even pages.
+#   3. Path to the output PDF file where the merged document will be saved.
+#
+# Note: The script assumes that the input PDF files contain only single-page documents, and that the number of pages in both files is equal or one more.
 
 import sys
 import PyPDF2

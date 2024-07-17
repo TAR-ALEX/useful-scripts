@@ -1,3 +1,9 @@
 #!/bin/bash
-# install imagemagick
+# Usage:
+# This script combines multiple JPEG images into one vertical image using ImageMagick.
+# Simply run the script in the same directory as your JPEG files, and it will create an output file named "appended.jpg".
+# Good if used with batch schreenshoting.
+
+# Install ImageMagick if not already installed:
+# sudo apt-get install imagemagick
 convert -append *.jpg appended.jpg

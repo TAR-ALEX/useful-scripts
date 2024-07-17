@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# This script compresses PDF files using Ghostscript. It can be used to reduce 
+# the size of PDF files by removing unnecessary elements and optimizing the 
+# file format.
+#
+# Usage: Run this script in the directory containing the PDF files you want 
+# to compress, or pass the file path as an argument (e.g., ./compress_pdf /path/to/file.pdf)
+
 # Default DPI value
 DEFAULT_DPI=150
 

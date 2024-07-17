@@ -1,6 +1,14 @@
 #!/bin/bash
 
-# to be used to cleanup the pandoc command from convertDocxToMd
+# Description: 
+# This script converts Markdown files from a given directory to plaintext files.
+# to be used to cleanup the pandoc command from convertDocxToMd for further processing
+# Usage:
+# convert_md_to_simple <input-dir> [output-dir]
+# Where:
+# - input-dir: The directory containing the Markdown files to be converted.
+# - output-dir: Optional, specifies the directory where the plaintext files will be saved. If not provided, the script will create a new directory named 'plaintext' in the parent directory of the input directory.
+# Example: convert_md_to_simple my-markdown-input  my-plaintext-output
 
 # Check for the correct number of arguments
 if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then

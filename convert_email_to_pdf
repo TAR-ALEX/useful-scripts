@@ -1,4 +1,15 @@
 #!/bin/python3
+
+# This Python script converts one or more email files (EML) into PDF format.
+#
+# Usage:
+# 1. Run the script: `convert_email_to_pdf`
+# 2. Specify a directory containing EML files as the command-line argument, 
+#    e.g., `convert_email_to_pdf /path/to/email/directory`
+# The script will convert all EML files in the specified directory to PDF and save them with the same name but with a `.pdf` extension.
+#
+# Note: This script requires Python 3.x and the `email`, `BeautifulSoup`, and `pdfkit` libraries.
+
 import os
 import email
 from bs4 import BeautifulSoup
