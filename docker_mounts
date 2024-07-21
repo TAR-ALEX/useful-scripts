@@ -1,0 +1,5 @@
+#!/bin/bash
+
+CONTAINER_NAME=$1
+
+docker inspect --format '{{range $p,$conf := .Mounts}}{{$p}}:{{index $conf.Type}} {{index $conf.Source}} -> {{index $conf.Destination}}<newline>{{end}}' "$CONTAINER_NAME" | sed -e 's/<newline>/\n/g'

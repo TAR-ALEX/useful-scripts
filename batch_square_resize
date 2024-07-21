@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+from PIL import Image, ImageFile
+import shutil
+
+# This will allow truncated images to be processed
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+def resize_images_to_square(directory, size):
+    originals_dir = os.path.join(directory, 'originals')
+    os.makedirs(originals_dir, exist_ok=True)
+
+    for filename in os.listdir(directory):
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif')):
+            original_path = os.path.join(directory, filename)
+            backup_path = os.path.join(originals_dir, filename)
+
+            # Backup the original image
+            shutil.copy2(original_path, backup_path)
+
+            try:
+                with Image.open(original_path) as img:
+                    width, height = img.size
+
+                    # Determine the size of the square side
+                    square_size = min(width, height)
+
+                    # Calculate cropping box, always starting from top-left corner
+                    left = 0
+                    top = 0
+                    right = left + square_size
+                    bottom = top + square_size
+
+                    # Crop the image to the square box
+                    img_cropped = img.crop((left, top, right, bottom))
+
+                    # Resize the image to the specified size only if it's larger
+                    if square_size > size:
+                        img_resized = img_cropped.resize((size, size))
+                    else:
+                        img_resized = img_cropped
+
+                    # Change the filename extension to .jpeg
+                    new_filename = os.path.splitext(filename)[0] + '.jpeg'
+                    new_path = os.path.join(directory, new_filename)
+
+                    # Save the resized image as JPEG
+                    img_resized = img_resized.convert("RGB")  # Ensure image is in RGB mode
+                    img_resized.save(new_path, 'JPEG')
+
+                    print(f"Processed {filename}, original saved in 'originals' directory")
+
+                    # Optionally, remove the original file if not needed
+                    os.remove(original_path)
+
+            except Exception as e:
+                print(f"Failed to process {filename}: {e}")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: batch_square_resize <size>")
+        sys.exit(1)
+
+    try:
+        size = int(sys.argv[1])
+    except ValueError:
+        print("Size must be an integer.")
+        sys.exit(1)
+
+    directory = os.getcwd()
+    resize_images_to_square(directory, size)
+
