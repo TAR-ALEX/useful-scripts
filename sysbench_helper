@@ -1,0 +1,112 @@
+#!/bin/bash
+
+# ============================================================================
+# Sysbench Benchmarking Script
+# ============================================================================
+#
+# Usage:
+#   ./sysbench_benchmark.sh [options] <thread_count> ...
+#
+# Options:
+#   --duration <seconds>  Set the duration of each benchmark test (default: 30)
+#
+# Description:
+#   This script runs a series of sysbench benchmarks to measure system performance.
+#   It takes one or more thread counts as arguments, and runs the following tests:
+#     * CPU test: measures CPU performance
+#     * Memory test: measures memory bandwidth
+#     * Mutex test: measures mutex contention (only run with multiple threads)
+#     * Thread test: measures thread creation and execution overhead
+#
+#   If no thread counts are specified, it defaults to running the tests with 1 thread
+#   and the number of CPU cores available on the system.
+#
+# Output:
+#   The results of each benchmark test are logged to a file named "sysbench_results_<timestamp>.log"
+#
+
+# Default values
+DURATION=30
+THREAD_COUNTS=()
+
+# Parse command-line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --duration)
+            shift
+            DURATION=$1
+            ;;
+        *)
+            if [[ $1 =~ ^[0-9]+$ ]]; then
+                THREAD_COUNTS+=($1)
+            fi
+            ;;
+    esac
+    shift
+done
+
+# If no thread counts were specified, default to 1 and the number of CPU cores available on the system
+if [ ${#THREAD_COUNTS[@]} -eq 0 ]; then
+    NUM_CPUS=$(nproc)
+    THREAD_COUNTS=(1 $NUM_CPUS)
+fi
+
+# Directory to store the output logs
+OUTPUT_DIR="./sysbench_logs"
+mkdir -p $OUTPUT_DIR
+
+# File to store the results
+OUTPUT_FILE="$OUTPUT_DIR/sysbench_results_$(date +%Y%m%d_%H%M%S).log"
+
+# Redirect output to the file
+exec > >(tee -a $OUTPUT_FILE) 2>&1
+
+echo "Running sysbench tests with different thread counts"
+echo "Results will be saved in $OUTPUT_FILE"
+echo "----------------------------------------"
+
+# Function to run CPU tests with different thread counts
+run_cpu_tests() {
+    local threads=$1
+    echo "Running CPU test with $threads threads (Duration: ${DURATION}s)"
+    sysbench --threads=$threads --time=$DURATION cpu run
+    echo "----------------------------------------"
+}
+
+# Function to run Memory tests with different thread counts
+run_memory_tests() {
+    local threads=$1
+    echo "Running Memory test with $threads threads (Duration: ${DURATION}s)"
+    sysbench --threads=$threads --time=$DURATION memory run
+    echo "----------------------------------------"
+}
+
+# Function to run Mutex tests with different thread counts
+run_mutex_tests() {
+    local threads=$1
+    if [ $threads -gt 1 ]; then
+        echo "Running Mutex test with $threads threads (Duration: ${DURATION}s)"
+        sysbench --threads=$threads --time=$DURATION mutex run
+    else
+        echo "Skipping Mutex test as it doesn't make sense with 1 thread."
+    fi
+    echo "----------------------------------------"
+}
+
+# Function to run Thread tests with different thread counts
+run_thread_tests() {
+    local threads=$1
+    echo "Running Thread test with $threads threads (Duration: ${DURATION}s)"
+    sysbench --threads=$threads --time=$DURATION threads run
+    echo "----------------------------------------"
+}
+
+# Run all tests for each thread count
+for THREADS in "${THREAD_COUNTS[@]}"; do
+    run_cpu_tests $THREADS
+    run_memory_tests $THREADS
+    run_mutex_tests $THREADS
+    run_thread_tests $THREADS
+done
+
+echo "Sysbench testing completed."
