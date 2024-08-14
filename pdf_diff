@@ -1,0 +1,47 @@
+#!/bin/python3
+
+import sys
+from pdf2image import convert_from_path
+import cv2
+import numpy as np
+from PIL import Image
+
+def convert_pdf_to_images(pdf_path):
+    return convert_from_path(pdf_path)
+
+def compare_images(image1, image2):
+    # Ensure the images are the same size
+    image2 = cv2.resize(image2, (image1.shape[1], image1.shape[0]))
+
+    # Compute the absolute difference
+    difference = cv2.absdiff(image1, image2)
+
+    # Apply a colormap (e.g., hot) to highlight differences
+    return cv2.applyColorMap(difference, cv2.COLORMAP_HOT)
+
+def main(pdf1_path, pdf2_path, output_pdf):
+    images1 = convert_pdf_to_images(pdf1_path)
+    images2 = convert_pdf_to_images(pdf2_path)
+
+    diff_images = []
+
+    for img1, img2 in zip(images1, images2):
+        img1 = np.array(img1)
+        img2 = np.array(img2)
+
+        diff_img = compare_images(img1, img2)
+        diff_images.append(Image.fromarray(diff_img))
+
+    diff_images[0].save(output_pdf, save_all=True, append_images=diff_images[1:])
+
+if __name__ == "__main__":
+    if len(sys.argv) != 4:
+        print("Usage: python script.py pdf1.pdf pdf2.pdf output.pdf")
+        sys.exit(1)
+
+    pdf1_path = sys.argv[1]
+    pdf2_path = sys.argv[2]
+    output_pdf = sys.argv[3]
+
+    main(pdf1_path, pdf2_path, output_pdf)
+
