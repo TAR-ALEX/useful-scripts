@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Set default dimensions
+DEFAULT_WIDTH=1000
+DEFAULT_QUALITY=80
+
+# Function to display usage
+usage() {
+    echo "Usage: $0 [width] [height]"
+    echo "Resizes all .JPG files to the specified width or height while maintaining aspect ratio."
+    echo "If no parameters are provided, defaults to width of $DEFAULT_WIDTH pixels."
+    echo "Quality will be set to $DEFAULT_QUALITY%."
+}
+
+# Check if ImageMagick's convert command is available
+if ! command -v convert &> /dev/null; then
+    echo "Error: ImageMagick's 'convert' command is required but not found."
+    echo "Please install ImageMagick to use this script."
+    exit 1
+fi
+
+# Parse command line arguments
+WIDTH=$DEFAULT_WIDTH
+HEIGHT=""
+
+if [ $# -ge 1 ]; then
+    if [[ $1 =~ ^[0-9]+$ ]]; then
+        WIDTH=$1
+    else
+        usage
+        exit 1
+    fi
+    if [ $# -ge 2 ]; then
+        if [[ $2 =~ ^[0-9]+$ ]]; then
+            HEIGHT=$2
+        else
+            usage
+            exit 1
+        fi
+    fi
+fi
+
+# Create the downsized directory if it doesn't exist
+mkdir -p downsized
+
+# Process each .JPG file
+for img in *.JPG; do
+    if [ -f "$img" ]; then
+        # Determine the output filename
+        output="downsized/${img%.JPG}.jpg"
+        
+        # Resize the image with the specified width or height, maintaining aspect ratio
+        if [ -n "$HEIGHT" ]; then
+            convert "$img" -resize "${WIDTH}x${HEIGHT}>" -quality $DEFAULT_QUALITY "$output"
+        else
+            convert "$img" -resize "${WIDTH}>" -quality $DEFAULT_QUALITY "$output"
+        fi
+        
+        echo "Resized and saved: $output"
+    fi
+done
+
+echo "All images have been processed."

@@ -9,6 +9,30 @@ from PIL import Image
 def convert_pdf_to_images(pdf_path):
     return convert_from_path(pdf_path)
 
+def compare_images_xor(image1, image2):
+    # Ensure the images are the same size
+    image2 = cv2.resize(image2, (image1.shape[1], image1.shape[0]))
+
+    # Perform bitwise XOR between the two images
+    xor_image = cv2.bitwise_xor(image1, image2)
+
+    # Subtract the XOR result from white (255) for a negative effect
+    inverted_image = 255 - xor_image
+
+    return inverted_image
+
+def compare_images_absdiff(image1, image2):
+    # Ensure the images are the same size
+    image2 = cv2.resize(image2, (image1.shape[1], image1.shape[0]))
+
+    # Calculate the absolute difference between the images
+    diff_image = cv2.absdiff(image1, image2)
+
+    # Subtract the result from white (255) for a negative effect
+    inverted_image = 255 - diff_image
+
+    return inverted_image
+
 def compare_images(image1, image2):
     # Ensure the images are the same size
     image2 = cv2.resize(image2, (image1.shape[1], image1.shape[0]))
@@ -29,7 +53,7 @@ def main(pdf1_path, pdf2_path, output_pdf):
         img1 = np.array(img1)
         img2 = np.array(img2)
 
-        diff_img = compare_images(img1, img2)
+        diff_img = compare_images_absdiff(img1, img2)
         diff_images.append(Image.fromarray(diff_img))
 
     diff_images[0].save(output_pdf, save_all=True, append_images=diff_images[1:])

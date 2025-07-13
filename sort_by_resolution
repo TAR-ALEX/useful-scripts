@@ -1,0 +1,142 @@
+#!/bin/python3
+import os
+import sys
+import shutil
+from PIL import Image
+
+def parse_resolution(resolution_str):
+    """Parse the resolution string (e.g., '1024x1024') into width and height."""
+    try:
+        width, height = map(int, resolution_str.lower().split('x'))
+        return width, height
+    except ValueError:
+        raise ValueError("Invalid resolution format. Use 'WxH' (e.g., '1024x1024').")
+
+def is_image(file_path):
+    """Check if a file is an image by its extension."""
+    image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp'}
+    return os.path.splitext(file_path)[1].lower() in image_extensions
+
+def filter_images_by_resolution(source_dir, max_width, max_height, comparison):
+    """Filter images in the source directory based on the comparison and resolution."""
+    filtered_images = []
+    for root, _, files in os.walk(source_dir):
+        for file in files:
+            if is_image(file):
+                file_path = os.path.join(root, file)
+                try:
+                    with Image.open(file_path) as img:
+                        width, height = img.size
+                        if comparison == "gt" and (width > max_width or height > max_height):
+                            filtered_images.append(file_path)
+                        elif comparison == "lt" and (width < max_width and height < max_height):
+                            filtered_images.append(file_path)
+                except Exception as e:
+                    print(f"Skipping {file_path}: {e}")
+    return filtered_images
+
+def create_hardlinks_or_copy(image_paths, dest_dir):
+    """Create hard links for the filtered images in the destination directory. If hard linking fails, copy the files."""
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+
+    hardlink_failed = False  # Track if hard linking has failed at least once
+
+    for image_path in image_paths:
+        file_name = os.path.basename(image_path)
+        dest_path = os.path.join(dest_dir, file_name)
+        try:
+            os.link(image_path, dest_path)
+            print(f"Created hard link: {dest_path}")
+        except (FileExistsError, OSError) as e:
+            if isinstance(e, FileExistsError):
+                print(f"Skipping {file_name}: File already exists in destination.")
+            else:
+                if not hardlink_failed:
+                    print("Hard linking failed (possibly due to cross-filesystem limitation). Falling back to copying files.")
+                    hardlink_failed = True
+                try:
+                    shutil.copy2(image_path, dest_path)
+                    print(f"Copied file: {dest_path}")
+                except Exception as copy_error:
+                    print(f"Failed to copy {file_name}: {copy_error}")
+        except Exception as e:
+            print(f"Failed to create hard link or copy for {file_name}: {e}")
+
+def print_usage():
+    """Print usage information."""
+    script_name = os.path.basename(sys.argv[0])
+    print(f"""
+Usage: {script_name} <source_dir> <dest_dir> [options]
+
+Options:
+  -r RESOLUTION    Set the resolution filter (e.g., '1024x1024'). Default: '1024x1024'.
+  -gt              Filter images with resolution GREATER THAN the specified resolution (default).
+  -lt              Filter images with resolution LESS THAN the specified resolution.
+  -h               Show this help message.
+
+Example:
+  {script_name} /path/to/source /path/to/destination -r 800x600 -lt
+  {script_name} /path/to/source /path/to/destination -r 1920x1080 -gt
+""")
+
+def main():
+    # Default values
+    resolution_str = "1024x1024"
+    comparison = "gt"  # Default to greater than
+
+    # Parse command-line arguments
+    args = sys.argv[1:]
+    if "-h" in args:
+        print_usage()
+        sys.exit(0)
+
+    if len(args) < 2:
+        print("Error: Missing required arguments.")
+        print_usage()
+        sys.exit(1)
+
+    source_dir = args[0]
+    dest_dir = args[1]
+
+    # Parse optional arguments
+    i = 2
+    while i < len(args):
+        if args[i] == "-r":
+            resolution_str = args[i + 1]
+            i += 2
+        elif args[i] == "-gt":
+            comparison = "gt"
+            i += 1
+        elif args[i] == "-lt":
+            comparison = "lt"
+            i += 1
+        else:
+            print(f"Error: Unknown option '{args[i]}'.")
+            print_usage()
+            sys.exit(1)
+
+    # Validate source directory
+    if not os.path.isdir(source_dir):
+        print(f"Error: Source directory '{source_dir}' does not exist.")
+        sys.exit(1)
+
+    # Parse resolution
+    try:
+        max_width, max_height = parse_resolution(resolution_str)
+    except ValueError as e:
+        print(e)
+        sys.exit(1)
+
+    # Filter images by resolution
+    print(f"Filtering images in '{source_dir}' with resolution {comparison.upper()} {max_width}x{max_height}...")
+    filtered_images = filter_images_by_resolution(source_dir, max_width, max_height, comparison)
+
+    # Create hard links or copy files in the destination directory
+    print(f"Processing images into '{dest_dir}'...")
+    create_hardlinks_or_copy(filtered_images, dest_dir)
+
+    print("Done!")
+
+if __name__ == "__main__":
+    main()

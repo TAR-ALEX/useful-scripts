@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Transcode all audio files in current directory to 16-bit FLAC (high compression, max compatibility)
+
+shopt -s nocaseglob
+mkdir -p converted
+for filename in *; do
+    [[ "$filename" == "$0" || "$filename" == "converted" ]] && continue
+    ffmpeg -i "$filename" -vn -sample_fmt s16 -compression_level 8 "converted/${filename%.*}.flac"
+done
+exit 0
+

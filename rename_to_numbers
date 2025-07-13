@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# Default values
+DIRECTORY="."
+DIGITS=4
+START=1
+
+# Function to display usage
+usage() {
+    echo "Usage: $0 [-d directory] [-n digits] [-s start]"
+    echo "  -d  Directory containing files to rename (default: current directory)"
+    echo "  -n  Number of digits for the prepended number (default: 4)"
+    echo "  -s  Starting number (default: 1)"
+    exit 1
+}
+
+# Parse command-line options
+while getopts ":d:n:s:" opt; do
+    case ${opt} in
+        d)
+            DIRECTORY=$OPTARG
+            ;;
+        n)
+            DIGITS=$OPTARG
+            ;;
+        s)
+            START=$OPTARG
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG" >&2
+            usage
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument." >&2
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND -1))
+
+# Check if the directory exists
+if [ ! -d "$DIRECTORY" ]; then
+    echo "Directory $DIRECTORY does not exist."
+    exit 1
+fi
+
+# Initialize counter
+counter=$START
+
+# Loop through files in the directory
+for file in "$DIRECTORY"/*; do
+    if [ -f "$file" ]; then
+        # Get the file extension
+        extension="${file##*.}"
+        
+        # Generate the new filename with leading zeros
+        new_name=$(printf "%0${DIGITS}d" $counter)
+        
+        # Rename the file
+        mv "$file" "$DIRECTORY/${new_name}.${extension}"
+        
+        # Increment the counter
+        counter=$((counter + 1))
+    fi
+done
+
+echo "Renaming completed."

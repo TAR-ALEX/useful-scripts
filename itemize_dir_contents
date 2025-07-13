@@ -1,0 +1,90 @@
+#!/bin/python3
+
+import os
+import string
+from collections import OrderedDict
+
+def write_roman(num):
+#https://stackoverflow.com/questions/28777219/basic-program-to-convert-integer-to-roman-numerals
+
+    roman = OrderedDict()
+    roman[1000] = "M"
+    roman[900] = "CM"
+    roman[500] = "D"
+    roman[400] = "CD"
+    roman[100] = "C"
+    roman[90] = "XC"
+    roman[50] = "L"
+    roman[40] = "XL"
+    roman[10] = "X"
+    roman[9] = "IX"
+    roman[5] = "V"
+    roman[4] = "IV"
+    roman[1] = "I"
+
+    def roman_num(num):
+        for r in roman.keys():
+            x, y = divmod(num, r)
+            yield roman[r] * x
+            num -= (r * x)
+            if num <= 0:
+                break
+
+    return "".join([a for a in roman_num(num)])
+
+def list_files_in_directory(path):
+    """Recursively lists all files in the cwd, formatted with alternating numbering, Roman numerals, and alphabet letters."""
+    
+    def format_roman(num):
+        """Generates a lowercase Roman numeral (i, ii, iii...)."""
+        
+        return write_roman(num).lower()
+
+    def format_letter(num):
+        """Generates a lowercase letter sequence (a, b, c, ..., aa, ab, ...)."""
+        letters = string.ascii_lowercase
+        if num < 26:
+            return letters[num]
+        else:
+            return format_letter((num // 26) - 1) + letters[num % 26]
+
+    def list_dir_recursive(current_path, depth=1, bullet_type="roman"):
+        items = os.listdir(current_path)
+        items = sorted(items, key=lambda x: (os.path.isdir(os.path.join(current_path, x)), x.lower()))
+        
+        item_count = 1
+        for item in items:
+            full_path = os.path.join(current_path, item)
+            
+            # Choose bullet style based on depth
+            if bullet_type == "number":
+                bullet = f"{item_count}."
+            elif bullet_type == "roman":
+                bullet = f"{format_roman(item_count)}."
+            elif bullet_type == "letter":
+                bullet = f"{format_letter(item_count - 1)}."
+            else:
+                bullet = f"{item_count}."
+
+            # Print directory or file with indentation based on depth
+            print(f"{' ' * (depth - 1) * 5}{bullet} {item}")
+            
+            if os.path.isdir(full_path):
+                # Switch bullet type in sequence: number -> roman -> letter -> number
+                next_bullet_type = (
+                    "roman" if bullet_type == "number" else
+                    "letter" if bullet_type == "roman" else
+                    "number"
+                )
+                list_dir_recursive(full_path, depth + 1, next_bullet_type)
+            
+            item_count += 1
+
+    # Start the listing process
+    print(f"Listing files in directory: {path}\n")
+    list_dir_recursive(path)
+
+# Use the current working directory
+cwd = os.getcwd()
+list_files_in_directory(cwd)
+

@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Check if pdftk is installed
+if ! command -v pdftk &> /dev/null; then
+    echo "Error: pdftk is not installed. Please install it first."
+    echo "On Ubuntu/Debian, try: sudo apt install pdftk"
+    echo "On Fedora, try: sudo dnf install pdftk"
+    echo "On macOS (with Homebrew), try: brew install pdftk-java"
+    exit 1
+fi
+
+# Check if all.pdf already exists
+if [ -f "all.pdf" ]; then
+    echo "Error: all.pdf already exists in the current directory."
+    echo "Please remove or rename it before running this script."
+    exit 1
+fi
+
+# Check if there are any PDF files in the current directory
+shopt -s nullglob
+pdf_files=(*.pdf)
+if [ ${#pdf_files[@]} -eq 0 ]; then
+    echo "Error: No PDF files found in the current directory."
+    exit 1
+fi
+
+# Check if the only PDF is all.pdf (though we already checked, this is a safeguard)
+if [ ${#pdf_files[@]} -eq 1 ] && [ "${pdf_files[0]}" == "all.pdf" ]; then
+    echo "Error: No PDF files found besides all.pdf"
+    exit 1
+fi
+
+# Merge all PDF files (excluding all.pdf if it somehow got included)
+files_to_merge=()
+for file in "${pdf_files[@]}"; do
+    if [ "$file" != "all.pdf" ]; then
+        files_to_merge+=("$file")
+    fi
+done
+
+echo "Merging the following PDF files:"
+printf '%s\n' "${files_to_merge[@]}"
+pdftk "${files_to_merge[@]}" cat output all.pdf
+
+# Check if the merge was successful
+if [ $? -eq 0 ]; then
+    echo "Successfully merged PDFs into all.pdf"
+    echo "Output file size: $(du -h all.pdf | cut -f1)"
+else
+    echo "Error: Failed to merge PDFs"
+    exit 1
+fi

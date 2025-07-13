@@ -3,22 +3,18 @@
 import os
 import sys
 from PIL import Image, ImageFile
-import shutil
 
 # This will allow truncated images to be processed
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 def resize_images_to_square(directory, size):
-    originals_dir = os.path.join(directory, 'originals')
-    os.makedirs(originals_dir, exist_ok=True)
+    # Create a 'cropped' directory to save the processed images
+    cropped_dir = os.path.join(directory, 'cropped')
+    os.makedirs(cropped_dir, exist_ok=True)
 
     for filename in os.listdir(directory):
         if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif')):
             original_path = os.path.join(directory, filename)
-            backup_path = os.path.join(originals_dir, filename)
-
-            # Backup the original image
-            shutil.copy2(original_path, backup_path)
 
             try:
                 with Image.open(original_path) as img:
@@ -27,11 +23,11 @@ def resize_images_to_square(directory, size):
                     # Determine the size of the square side
                     square_size = min(width, height)
 
-                    # Calculate cropping box, always starting from top-left corner
-                    left = 0
-                    top = 0
-                    right = left + square_size
-                    bottom = top + square_size
+                    # Calculate cropping box to center the crop
+                    left = (width - square_size) / 2
+                    top = (height - square_size) / 2
+                    right = (width + square_size) / 2
+                    bottom = (height + square_size) / 2
 
                     # Crop the image to the square box
                     img_cropped = img.crop((left, top, right, bottom))
@@ -44,16 +40,13 @@ def resize_images_to_square(directory, size):
 
                     # Change the filename extension to .jpeg
                     new_filename = os.path.splitext(filename)[0] + '.jpeg'
-                    new_path = os.path.join(directory, new_filename)
+                    new_path = os.path.join(cropped_dir, new_filename)
 
                     # Save the resized image as JPEG
                     img_resized = img_resized.convert("RGB")  # Ensure image is in RGB mode
                     img_resized.save(new_path, 'JPEG')
 
-                    print(f"Processed {filename}, original saved in 'originals' directory")
-
-                    # Optionally, remove the original file if not needed
-                    os.remove(original_path)
+                    print(f"Processed {filename}, cropped image saved in 'cropped' directory")
 
             except Exception as e:
                 print(f"Failed to process {filename}: {e}")
@@ -71,4 +64,3 @@ if __name__ == "__main__":
 
     directory = os.getcwd()
     resize_images_to_square(directory, size)
-
